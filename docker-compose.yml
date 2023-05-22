@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+
+  backend:
+    build: .
+    environment:
+      ENV_DB_ENGINE: django.db.backends.postgresql
+      ENV_DB_NAME: netology_stocks_products
+      ENV_DB_USER: postgres
+      ENV_DB_PASSWORD: 111
+      ENV_DB_HOST: postgres_db
+      ENV_DB_PORT: 5432
+    ports:
+      - "8000:9000"
+    command: >
+      sh -c "python manage.py migrate && gunicorn stocks_products.wsgi:application --bind 0.0.0.0:9000"
+    depends_on:
+      - postgres_db
+
+  postgres_db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: netology_stocks_products
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 111
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", pg_isready -U admin -d netology_stocks_products]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    ports:
+      - '5433:5432'
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "aaa@yandex.ru"
+      PGADMIN_DEFAULT_PASSWORD: "111"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 1G
+    depends_on:
+      - postgres_db
+
+  nginx:
+    image: nginx
+    volumes:
+      - .:/app
+      - ./nginx-config:/etc/nginx/conf.d
+    ports:
+      - '8080:80'
+    depends_on:
+      - backend

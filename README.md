@@ -1,17 +1,24 @@
-### Создание образа докер на основе Dockerfile:
+### Создание сети контейнеров:
 
-`docker build --tag dj-server . `
+`docker-compose up -d --build`
 
-### Запуск контейнера на основе образа:
+1. PgAdmin: host http://127.0.0.1:5050/  
+   * Host name: postgres_db
+   * Port: 5432
+   * Maintenaince: netology_stocks_products
+   * Username: postgres
+   * Password: 111
+          
 
-`docker run -d -p 8000:8000 dj-server`
+2. Приложение: host http://127.0.0.1:8080/api/v1/  
+
 
 ### Проверка с помощью Postman:
 
 **Добавить данные:**
 
 ```
-POST http://127.0.0.1:8000/api/v1/products/
+POST http://127.0.0.1:8080/api/v1/products/
 
 Content-Type: application/json 
 
@@ -22,4 +29,4 @@ Content-Type: application/json
 ```
 **Проверить данные:**
 
-`GET http://127.0.0.1:8000/api/v1/products/`
+`GET http://127.0.0.1:8080/api/v1/products/`
